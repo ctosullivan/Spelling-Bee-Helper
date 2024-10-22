@@ -24,9 +24,12 @@ class Bee_database:
         self.res = self.cur.execute("SELECT name FROM sqlite_master")
         result = self.res.fetchone()
         if result is None:
-            self.cur.execute("CREATE TABLE spelling_bee(word_id,word,num_letters,status,status_date)")
+            self.cur.execute("CREATE TABLE spelling_bee(word_id INT,word TEXT PRIMARY KEY,num_letters INT,status WORD,status_date DATE)")
             self.res = self.cur.execute("SELECT name FROM sqlite_master")
             result = self.res.fetchone()
+
+    def close_database(self):
+        self.bee_data.close()
 
     def insert_test_transactions(self):
         data = [
@@ -49,31 +52,34 @@ class Bee_database:
         for row in self.cur.execute("SELECT word, status_date FROM spelling_bee ORDER BY status_date"):
             print(row)
 
-    def close_database(self):
-        self.bee_data.close()
+    def insert_update_transactions(self,word_file):
 
+        # Split out individual transactions with DATE - a valid transaction starts with and ends with a date field
+        split_regex = re.compile(r'(?=DATE:)',re.MULTILINE | re.IGNORECASE)
+        word_file = re.split(split_regex,word_file.read())
+        # Discard first item in list - empty split prior to first transaction
+        word_file.pop(0)
+        transactions = word_file
 
+        #Split transaction into fields using regexes
+        date_regex = re.compile(r'^DATE:\n(?P<date>(?:\d{4}-(\d{2}|\d{1})-(\d{2}|\d{1}$)))', re.IGNORECASE|re.MULTILINE)
 
-    def import_words(self,word_list):
-        '''
-        Opens a file (word_list) and returns the file content
-        '''
-        try:
-            # Open the file in read mode
-            with open(word_list, 'r') as file:
-                return file.read()
-        
-        except FileNotFoundError:
-            # Handle the case where the file does not exist
-            print(f"Error: The file '{word_list}' was not found.")
-            return -1
-        
-        except IOError:
-            # Handle any other IO-related errors
-            print(f"Error: An I/O error occurred while reading the file '{word_list}'.")
-            return -1
-        except Exception as e:
-            # Catch any other unexpected errors
-            print(f"An unexpected error occurred: {e}")
-            return -1
-        
+        allowed_regex = re.compile(r'^ALLOWED:\s*(?P<allowed>(?:\s*\w+\n?\s*)+$)', re.IGNORECASE|re.MULTILINE)
+
+        disallowed_regex = re.compile(r'^DISALLOWED:\s*\n(?P<disallowed>(?:\s*\w+\s*)+$)', re.IGNORECASE|re.MULTILINE)
+
+        for transaction in transactions:
+            date = re.match(date_regex,transaction).group(1)
+            allowed_transactions = re.findall(allowed_regex,transaction)[0]
+            disallowed_transactions = re.findall(disallowed_regex,transaction)[0]
+            split_allowed_transactions = re.split(r'\n',allowed_transactions)
+            split_disallowed_transactions = re.split(r'\n',disallowed_transactions)
+            allowed_words = []
+            disallowed_words = []
+            for item in split_allowed_transactions:
+                if item != "":
+                    allowed_words.append(item.upper())
+            for item in split_disallowed_transactions:
+                if item != "":
+                    disallowed_words.append(item.upper())
+            print(date,allowed_words,disallowed_words)
