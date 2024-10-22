@@ -2,7 +2,7 @@ import sqlite3
 import re
 
 class Bee_database:
-    def __init__(self):
+    def __init__(self) -> None:
         '''
         Connect to existing database, or create a new one if it doesn't exist already
         '''

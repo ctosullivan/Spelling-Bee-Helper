@@ -1,7 +1,7 @@
 from _tools import Tool
 
 class Helper(Tool):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         pass
 

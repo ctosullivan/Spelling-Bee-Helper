@@ -1,11 +1,13 @@
 from _database import Bee_database
 from _helper import Helper
 from _solver import Solver
+from _interface import Interface
 
 if __name__ == "__main__":
     bee_data = Bee_database()
     test_helper = Helper()
     test_solver = Solver()
+    interface = Interface()
     bee_data.initialise_database()
     # bee_data.insert_test_transactions()
     bee_data.retrieve_test_transactions()
