@@ -24,7 +24,7 @@ class Bee_database:
         self.res = self.cur.execute("SELECT name FROM sqlite_master")
         result = self.res.fetchone()
         if result is None:
-            self.cur.execute("CREATE TABLE spelling_bee(word_id INT,word TEXT PRIMARY KEY,num_letters INT,status WORD,status_date DATE)")
+            self.cur.execute("CREATE TABLE spelling_bee(word_id INTEGER PRIMARY KEY,word TEXT UNIQUE,num_letters INT,status WORD,status_date DATE)")
             self.res = self.cur.execute("SELECT name FROM sqlite_master")
             result = self.res.fetchone()
 
@@ -49,10 +49,10 @@ class Bee_database:
         self.bee_data.commit()
 
     def retrieve_test_transactions(self):
-        for row in self.cur.execute("SELECT word, status_date FROM spelling_bee ORDER BY status_date"):
+        for row in self.cur.execute("SELECT word_id, word, num_letters, status, status_date FROM spelling_bee ORDER BY status_date"):
             print(row)
 
-    def insert_update_transactions(self,word_file):
+    def upsert_transactions(self,word_file):
 
         # Split out individual transactions with DATE - a valid transaction starts with and ends with a date field
         split_regex = re.compile(r'(?=DATE:)',re.MULTILINE | re.IGNORECASE)
@@ -69,6 +69,7 @@ class Bee_database:
         disallowed_regex = re.compile(r'^DISALLOWED:\s*\n(?P<disallowed>(?:\s*\w+\s*)+$)', re.IGNORECASE|re.MULTILINE)
 
         for transaction in transactions:
+            # print(transaction)
             date = re.match(date_regex,transaction).group(1)
             allowed_transactions = re.findall(allowed_regex,transaction)[0]
             disallowed_transactions = re.findall(disallowed_regex,transaction)[0]
@@ -82,4 +83,37 @@ class Bee_database:
             for item in split_disallowed_transactions:
                 if item != "":
                     disallowed_words.append(item.upper())
-            print(date,allowed_words,disallowed_words)
+
+            query = '''
+                INSERT INTO spelling_bee (word, num_letters, status, status_date)
+                VALUES (?, ?, ?, ?)
+                ON CONFLICT(word)
+                DO UPDATE SET
+                    status = CASE 
+                                WHEN excluded.status_date > spelling_bee.status_date 
+                                AND excluded.status != spelling_bee.status
+                                THEN excluded.status
+                                ELSE spelling_bee.status
+                            END,
+                    status_date = CASE 
+                                    WHEN excluded.status_date > spelling_bee.status_date 
+                                    AND excluded.status != spelling_bee.status
+                                    THEN excluded.status_date
+                                    ELSE spelling_bee.status_date
+                                END;
+            '''
+            for i in range(0,len(allowed_words)):
+                word = allowed_words[i]
+                num_letters = len(allowed_words[i])
+                status = "ALLOWED"
+                # print(word, num_letters, status, date)
+                self.cur.execute(query, (word, num_letters, status, date))
+
+            for i in range(0,len(disallowed_words)):
+                word = disallowed_words[i]
+                num_letters = len(disallowed_words[i])
+                status = "DISALLOWED"
+                # print(word, num_letters, status, date)
+                self.cur.execute(query, (word, num_letters, status, date))
+
+            self.bee_data.commit()
