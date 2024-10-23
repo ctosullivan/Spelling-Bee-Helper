@@ -6,7 +6,7 @@ class Helper(Tool):
         pass
 
     def test_helper(self, database):
-        first_two_letters = 'NI'
+        first_two_letters = 'HI'
         query = """
         SELECT word, num_letters, status, status_date
         FROM spelling_bee

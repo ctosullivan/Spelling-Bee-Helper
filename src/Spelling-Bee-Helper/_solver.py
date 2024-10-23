@@ -8,11 +8,8 @@ class Solver(Tool):
     def test_solver(self, database):
         
         #Regex credit - https://stackoverflow.com/a/78411195
-        
-        reg = "(?=.*E)^[NIETY]{4,}$"
-        # Define the allowed range of letters (example: 'abcdefg') and the mandatory letter (example: 'a')
-        allowed_letters = 'inty'
-        mandatory_letter = 'E'
+
+        reg = "(?=.*A)^[HAIRCUT]{4,}$"
 
         # Query to select words that:
         # 1. Contain the mandatory letter.
