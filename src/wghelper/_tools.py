@@ -8,7 +8,7 @@ class TextFileReader:
     '''
     A context manager to handle file opening, reading and closure.
 
-    # Source - https://realpython.com/python-magic-methods/#handling-setup-and-teardown-with-context-managers
+    # Source - https://realpython.com/python-magic-methods/handling-setup-and-teardown-with-context-managers
     '''
 
 
