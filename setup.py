@@ -1,4 +1,4 @@
-from distutils.core import setup, find_packages
+from setuptools import setup, find_packages
 
 setup(
     package_dir={'':'src'},
@@ -8,8 +8,8 @@ setup(
         'console_scripts': [
             'wghelper = wghelper.command_line:main',
         ]},
-    version=0.1,
-    license=MIT,
+    version='0.1',
+    license='MIT',
     description = "CLI tool to help solve various word games using logical and regular expressions",
     author = "Cormac O' Sullivan",
     author_email= 'cormac@cosullivan.dev',

@@ -1,6 +1,7 @@
 import sqlite3
 import re
 import sys
+import os
 
 class Word_database:
     def __init__(self,file_path="../../data/Word_Game_Helper_Data.db") -> None:
@@ -12,6 +13,8 @@ class Word_database:
             Exception: if any other upexpected error occurs
         '''
         try:
+            if not os.path.isdir('../../data'):
+                os.mkdir('../../data')
             self.word_data = sqlite3.connect(file_path)
             self.cur = self.word_data.cursor()
         
