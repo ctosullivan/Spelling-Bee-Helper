@@ -8,7 +8,7 @@ setup(
         'console_scripts': [
             'wghelper = wghelper.command_line:main',
         ]},
-    version='0.1',
+    version='0.2',
     license='MIT',
     description = "CLI tool to help solve various word games using logical and regular expressions",
     author = "Cormac O' Sullivan",
