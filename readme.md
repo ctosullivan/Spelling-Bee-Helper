@@ -6,11 +6,15 @@ The program initiates a SQLite database located in user's home/sbhelper director
 
 ## Usage:
 
-usage: sbhelper (-h) (-s (SBSOLVE)) (-sh (SBHELPER)) (-f (FILEIMPORT))
+usage: Spelling Bee Helper -h -s SBSOLVER -sh SBHELPER -f FILEIMPORT -g -v
 
 CLI tool to help solve various word games using logical and regular expressions
 
 ## Options:
+
+-g, --getdata Prints all data in the database
+
+-v, --version Displays the current program version
 
 -h, --help show this help message and exit
 
@@ -37,15 +41,21 @@ DISALLOWED:
 Example word list:
 
 DATE:
+
 2024-01-01
 
 ALLOWED:
+
 TUNIC
+
 TABLE
+
 FOO
+
 BAR
 
 DISALLOWED:
+
 TOMATO
 
 The word TOMATO would not appear in future results until specifically whitelisted again by adding a new wordfile and listing it as an allowed word,
