@@ -1,8 +1,8 @@
-from wghelper._helper import Helper
-from wghelper._solver import Solver
-from wghelper._interface import Interface
-from wghelper._database import Word_database
-from wghelper._tools import TextFileReader
+from sbhelper._helper import Helper
+from sbhelper._solver import Solver
+from sbhelper._interface import Interface
+from sbhelper._database import Word_database
+from sbhelper._tools import TextFileReader
 
 def main():
     '''

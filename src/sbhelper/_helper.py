@@ -1,4 +1,4 @@
-from wghelper._tools import Tool
+from sbhelper._tools import Tool
 
 class Helper(Tool):
     def __init__(self) -> None:

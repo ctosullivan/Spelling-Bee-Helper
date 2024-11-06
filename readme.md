@@ -1,12 +1,12 @@
-# Python Word Game Helper
+# Python Spelling Bee Helper
 
-A simple CLI to help solve word games. Only two functions to help solve NYTime Spelling Bee puzzles are supported at present - I hope to add additional functionality in the future including regex capabilities.
+A simple CLI to help NYTime Spelling Bee puzzles.
 
 The program initiates a SQLite database in the following relative directory to the installation: ../../data
 
 ## Usage:
 
-usage: Word Game Helper (-h) (-s (SBSOLVE)) (-sh (SBHELPER)) (-f (FILEIMPORT))
+usage: sbhelper (-h) (-s (SBSOLVE)) (-sh (SBHELPER)) (-f (FILEIMPORT))
 
 CLI tool to help solve various word games using logical and regular expressions
 

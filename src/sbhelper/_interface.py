@@ -1,6 +1,6 @@
 import argparse
 import sys
-from wghelper._constants import ValidationError
+from sbhelper._constants import ValidationError
 
 class Interface:
     def __init__(self) -> None:
