@@ -2,7 +2,7 @@
 
 A simple CLI tool to help solve NYTime Spelling Bee puzzles.
 
-The program initiates a SQLite database locatted in user's home/sbhelper directory
+The program initiates a SQLite database located in user's home/sbhelper directory
 
 ## Usage:
 
@@ -16,14 +16,17 @@ CLI tool to help solve various word games using logical and regular expressions
 
 -s (SBSOLVE), --sbsolve (SBSOLVE)
 Spelling Bee solver - enter the puzzle letters in the following format: "CentreLetter OtherLetters"
+
 Provides a full solution for a provided Spelling Bee puzzle using words stored in database
 
 -sh (SBHELPER), --sbhelper (SBHELPER)
 Spelling Bee helper - enter the starting letters followed by the word length in the following format: "AB 5"
+
 Lists words beginning with the specified letters from the database
 
 -f (FILEIMPORT), --fileimport (FILEIMPORT) Specify the path for the file you want to import in brackets
 Imports a word list text file in the following format:
+
 DATE:
 YYYY-M(M)-D(D)
 ALLOWED:
@@ -32,13 +35,16 @@ DISALLOWED:
 (optional)
 
 Example word list:
+
 DATE:
 2024-01-01
+
 ALLOWED:
 TUNIC
 TABLE
 FOO
 BAR
+
 DISALLOWED:
 TOMATO
 
@@ -49,7 +55,11 @@ Valid word transactions are inserted into the database using Upsert syntax - wor
 Example usage:
 
 Installation: pip install sbhelper
+
 View help: sbhelper -h
+
 Insert transactions from file: sbhelper -f "some_file.txt"
+
 Spelling Bee solver: sbhelper -s "A BCDEFG"
+
 Spelling Bee helper: sbhelper -sh "AB 5"
