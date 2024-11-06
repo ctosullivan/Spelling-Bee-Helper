@@ -17,7 +17,6 @@ class Solver(Tool):
         '''
         
         #Regex credit - https://stackoverflow.com/a/78411195
-
         reg = rf"^(?=.*{centre_letter})[{centre_letter}{other_letters}]{{4,}}$"
 
         query = """

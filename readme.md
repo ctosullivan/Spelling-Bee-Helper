@@ -1,8 +1,8 @@
 # Python Spelling Bee Helper
 
-A simple CLI to help NYTime Spelling Bee puzzles.
+A simple CLI tool to help solve NYTime Spelling Bee puzzles.
 
-The program initiates a SQLite database in the following relative directory to the installation: ../../data
+The program initiates a SQLite database locatted in user's home/sbhelper directory
 
 ## Usage:
 
@@ -10,7 +10,7 @@ usage: sbhelper (-h) (-s (SBSOLVE)) (-sh (SBHELPER)) (-f (FILEIMPORT))
 
 CLI tool to help solve various word games using logical and regular expressions
 
-### Options:
+## Options:
 
 -h, --help show this help message and exit
 
@@ -20,8 +20,34 @@ Spelling Bee solver - enter the puzzle letters in the following format: "CentreL
 -sh (SBHELPER), --sbhelper (SBHELPER)
 Spelling Bee helper - enter the starting letters followed by the word length in the following format: "AB 5"
 
--f (FILEIMPORT), --fileimport (FILEIMPORT)
-Import a word list text file in the following format:
-DATE: YYYY-M(M)-D(D) ALLOWED: (optional)
-DISALLOWED (optional). Specify
-the path for the file you want to import
+-f (FILEIMPORT), --fileimport (FILEIMPORT) Specify the path for the file you want to import in brackets
+Imports a word list text file in the following format:
+DATE:
+YYYY-M(M)-D(D)
+ALLOWED:
+(optional)
+DISALLOWED:
+(optional).
+
+Example word list:
+DATE:
+2024-01-01
+ALLOWED:
+TUNIC
+TABLE
+FOO
+BAR
+DISALLOWED:
+TOMATO
+
+The word TOMATO would not appear in future results until specifically whitelisted again by adding a new wordfile
+
+Valid word transactions are inserted into the database using Upsert syntax - words are unique values, a word's status will only be updated if the date of the transaction is after the pre-existing transaction.
+
+Example usage:
+
+Installation: pip install sbhelper
+View help: sbhelper -h
+Insert transactions from file: sbhelper -f "some_file.txt"
+Spelling Bee solver: sbhelper -s "A BCDEFG"
+Spelling Bee helper: sbhelper -sh "AB 5"

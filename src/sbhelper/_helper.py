@@ -5,7 +5,7 @@ class Helper(Tool):
         super().__init__()
         pass
 
-    def sb_helper(self, database, first_letters=str, length=int):
+    def sb_helper(self, database, first_letters=str, length=int) -> list:
         '''
         Spelling Bee helper function to provide a list of allowed words with a given length and given starting letters
         Args:

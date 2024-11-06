@@ -1,45 +1,61 @@
 import sqlite3
 import re
 import sys
-import os
+import pathlib
 
 class Word_database:
-    def __init__(self,file_path="../../data/Word_Game_Helper_Data.db") -> None:
+
+    DATABASE_PATH = pathlib.Path.home() / "sbhelper"
+    DATABASE_PATH.mkdir(parents=True, exist_ok=True)
+    DATABASE_PATH = DATABASE_PATH / "sbhelper.db"
+
+    def __init__(self,file_path=DATABASE_PATH) -> None | FileNotFoundError | IOError | Exception:
         '''
         Connect to existing database, or create a new database if it doesn't exist already. Also defines REGEXP function for use with SQLite database
         Raises:
             FileNotFoundError: if database file cannot be found
             IOError: if any other IO error occurs
-            Exception: if any other upexpected error occurs
+            Exception: if any other unexpected error occurs
         '''
         try:
-            if not os.path.isdir('../../data'):
-                os.mkdir('../../data')
             self.word_data = sqlite3.connect(file_path)
             self.cur = self.word_data.cursor()
         
         except FileNotFoundError:
-            # Handle the case where the file does not exist
             print(f"Error: The file {file_path} was not found.")
             sys.exit(1)
         
         except IOError:
-            # Handle any other IO-related errors
             print(f"Error: An I/O error occurred while reading the file {file_path}")
             sys.exit(1)
 
         except Exception as e:
-            # Catch any other unexpected errors
             print(f"An unexpected error occurred: {e}")
             sys.exit(1)
-
         
-        # Enable RE in SQLite - credit https://stackoverflow.com/a/24053719
         def regexp(expr, item):
+            '''
+            Enables REGEXP function in SQLite - credit https://stackoverflow.com/a/24053719
+            '''
             reg = re.compile(expr)
             return reg.search(item) is not None
         
         self.word_data.create_function("REGEXP", 2, regexp)
+
+    def _run_query(self, query, *query_args)-> None:
+        ''' 
+        Execute provided SQLite query - Credit - https://realpython.com/contact-book-python-textual/
+        '''
+        result = self.cur.execute(query, [*query_args])
+        self.word_data.commit()
+        return result
+
+    def get_all_data(self)-> None:
+        '''
+        Returns all data in SQLite database
+        '''
+        result = self._run_query("SELECT * FROM word_data;")
+        return result.fetchall()
 
     def initialise_database(self) -> None:
         '''
@@ -56,33 +72,6 @@ class Word_database:
         Close database connection
         '''
         self.word_data.close()
-
-    def insert_test_transactions(self):
-        '''
-        Inserts test transactions for testing purposes
-        '''
-        data = [
-            # Schema: word_id, word, num_letters, status, status_date
-            ('TEN', 3, 'ALLOWED','2014-05-01'),
-            ('TWENTY', 6, 'ALLOWED','2014-05-01'),
-            ('THIRTY', 6, 'ALLOWED','2014-05-01'),
-            ('FORTY', 5, 'ALLOWED','2014-05-01'),
-            ('FIFTY', 5, 'ALLOWED','2014-05-01'),
-            ('SIXTY', 5, 'ALLOWED','2014-05-01'),
-            ('SEVENTY', 7, 'ALLOWED','2014-05-01'),
-            ('EIGHTY', 6, 'ALLOWED','2014-05-01'),
-            ('NINETY', 6, 'ALLOWED','2014-05-01'),
-            ('HUNDRED', 7, 'ALLOWED','2014-05-01'),
-        ]
-        self.cur.executemany("INSERT INTO word_data(word, num_letters, status, status_date) VALUES(?, ?, ?, ?)",data)
-        self.word_data.commit()
-
-    def retrieve_test_transactions(self) -> None:
-        '''
-        Prints transactions from database for testing purposes
-        '''
-        for row in self.cur.execute("SELECT word_id, word, num_letters, status, status_date FROM word_data ORDER BY status_date"):
-            print(row)
 
     def upsert_transactions(self,word_file) -> None:
         '''
@@ -101,7 +90,6 @@ class Word_database:
             word_file - a text file including valid word list transactions
         Returns: None
         '''
-        # Split out individual transactions with DATE - a valid transaction starts with and ends with a date field
         split_regex = re.compile(r'(?=DATE:)',re.MULTILINE | re.IGNORECASE)
         word_file = re.split(split_regex,word_file.read())
         
@@ -109,7 +97,7 @@ class Word_database:
         word_file.pop(0)
         transactions = word_file
 
-        #Split transaction into fields using regexes
+        #Split transaction into fields using regex
         date_regex = re.compile(r'^DATE:\s*\n(?P<date>(?:\d{4}-(\d{2}|\d{1})-(\d{2}|\d{1}$)))', re.IGNORECASE|re.MULTILINE)
         allowed_regex = re.compile(r'^ALLOWED:\s*$', re.IGNORECASE|re.MULTILINE)
         disallowed_regex = re.compile(r'^DISALLOWED:\s*$', re.IGNORECASE|re.MULTILINE)

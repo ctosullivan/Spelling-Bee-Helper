@@ -1,40 +1,54 @@
 import argparse
 import sys
 from sbhelper._constants import ValidationError
+import re
 
 class Interface:
     def __init__(self) -> None:
+        '''
+        Interface initialises argparser and parses/validates CLI args provided
+        '''
         self.argparser = argparse.ArgumentParser(
-        prog='Word Game Helper',
-        description='Tool to help solve various word games using logical and regular expressions',
-        epilog='CLI tool to solve various word games',
+        prog='Spelling Bee Helper',
+        description='Tool to help solve NYT Spelling Bee puzzles using a user-defined database',
+        epilog='CLI tool to help solve NYT Spelling Bee puzzles'
         )
-        self.argparser.add_argument('-s','--sbsolve',nargs='?',help='Spelling Bee solver - enter the puzzle letters in the following format: "CentreLetter OtherLetters"')
+        self.argparser.add_argument('-s','--sbsolver',type=str,help='Spelling Bee solver - enter the puzzle letters in the following format: "CentreLetter OtherLetters"')
 
-        self.argparser.add_argument('-sh','--sbhelper',nargs='?',help='Spelling Bee helper - enter the starting letters followed by the word length in the following format: "AB 5"')
+        self.argparser.add_argument('-sh','--sbhelper',type=str,help='Spelling Bee helper - enter the starting letters followed by the word length in the following format: "AB 5"')
 
-        self.argparser.add_argument('-f','--fileimport',nargs='?',help='Import a word list text file in the following format DATE: YYYY-M(M)-D(D) ALLOWED: (optional) DISALLOWED (optional). Specify the path for the file you want to import')
+        self.argparser.add_argument('-f','--fileimport',type=str,help='Import a word list text file in the following format DATE: YYYY-M(M)-D(D) ALLOWED: (optional) DISALLOWED (optional). Specify the path for the file you want to import')
 
-        # Credit to https://stackoverflow.com/a/12818237 - unknown arguments are ignored so that output can be passed to other commands
-        self.args = self.argparser.parse_known_args()
+        self.argparser.add_argument('-g','--getdata',help="Prints all data in the database",action='store_true')
+
+        self.argparser.add_argument('-v','--version',help='Displays the current program version',action='store_true')
+
+        self.args = self.argparser.parse_args()
     
-    def parse_args(self) -> str:
+    def parse_args(self) -> list | ValidationError:
         '''
-        Parses command line arguments received, performs validation and returns an array representing the arguments received - first element in the array returned is the command received
+        Parses command line arguments received, performs validation and returns an array representing the arguments received - first element in the array returned represents the command received
+        Raises:
+            ValidationError if CLI args fail validation tests
+        Returns:
+            Array representing CLI args received
         '''
-        file_import = getattr(self.args[0],"fileimport")
-        if file_import:
+        alpha_regex = re.compile(r'^[a-zA-Z]+$')
+
+        if self.args.getdata:
+            getdata_parsed = []
+            getdata_parsed.insert(0,"GET_DATA")
+            return getdata_parsed
+
+        if self.args.fileimport:
             file_import_parsed = []
             file_import_parsed.insert(0,"FILE_IMPORT")
-            file_import_parsed.insert(1,fr'{file_import}')
-
+            file_import_parsed.insert(1,f'{self.args.fileimport}')
             return file_import_parsed
 
-        sbsolve = getattr(self.args[0],"sbsolve")
-        if sbsolve:
-            sbsolve_parsed = sbsolve.split(" ")
-       
-            if not all(i.isalpha() for i in sbsolve_parsed):
+        if self.args.sbsolver:
+            sbsolve_parsed = self.args.sbsolver.split(" ")
+            if not all(re.fullmatch(alpha_regex,i) for i in sbsolve_parsed):
                 raise ValidationError('Please enter only letters separated by one space for the puzzle input e.g: "A BCDEFG"')
             
             elif len(sbsolve_parsed[0])>1:
@@ -47,15 +61,13 @@ class Interface:
                 # Convert to uppercase and remove any empty strings
                 sbsolve_parsed = [i.upper() for i in sbsolve_parsed if i]
                 return sbsolve_parsed
-        
-        sbhelper = getattr(self.args[0],"sbhelper")
-        if sbhelper:
-            sbhelper_parsed = sbhelper.split(" ")
-         
+
+        if self.args.sbhelper:
+            sbhelper_parsed = self.args.sbhelper.split()
             if len(sbhelper_parsed)>2 or len(sbhelper_parsed)<2:
                 raise ValidationError('Please enter a valid query for the puzzle helper e.g: "AB 5"')
             
-            elif not sbhelper[0].isalpha():
+            elif not alpha_regex.fullmatch(sbhelper_parsed[0]):
                 raise ValidationError('Please enter only letters separated by one space for the helper letters input e.g: "AB 5"')
             
             elif not sbhelper_parsed[1].isdigit():
@@ -71,3 +83,9 @@ class Interface:
                 # Convert length to int
                 sbhelper_parsed[2] = int(sbhelper_parsed[2])
                 return sbhelper_parsed
+            
+        if self.args.version:
+            version_parsed = ["VERSION"]
+            return version_parsed        
+        else:
+            sys.exit("No arguments provided - try sbhelper -h for help")
