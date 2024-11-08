@@ -20,14 +20,12 @@ def main():
     if cli_args[0]=="SBSOLVE":
         solutions=solver.sb_solver(word_data, cli_args[1],cli_args[2])
         if solutions:
-            print("SOLUTION:")
             for word in solutions:
                 print(word[0])
 
     elif cli_args[0]=="SBHELPER":
         solutions = helper.sb_helper(word_data, cli_args[1],cli_args[2])
         if solutions:
-            print("RESULTS:")
             for word in solutions:
                 print(word[0])
 

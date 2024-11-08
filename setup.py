@@ -8,7 +8,7 @@ setup(
         'console_scripts': [
             'sbhelper = sbhelper.command_line:main',
         ]},
-    version='0.2',
+    version='0.21',
     license='MIT',
     description = "CLI tool to help solve NYTimes Spelling Bee puzzles",
     author = "Cormac O' Sullivan",
